@@ -1,0 +1,137 @@
+---
+title: "Control Prenatal (San Bernardo 2022 2023)"
+author: 
+- Amaru Agüero Jiménez
+- Maria Paz Ross
+format:
+  html:
+    toc: true
+    number-sections: true
+    css: styles.css
+    code-fold: true
+---
+```{css, echo=FALSE}
+/* Definir la fuente personalizada para la tabla datatable */
+table.dataTable {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+}
+```
+
+# Library
+
+```{r message=FALSE, warning=FALSE}
+# Load necessary packages
+install_and_load_packages <- function(packages) {
+  for (package in packages) {
+    # Comprueba si el paquete está instalado
+    if (!require(package, character.only = TRUE)) {
+      # Instala el paquete si no está instalado
+      install.packages(package)
+      # Carga el paquete después de instalarlo
+      library(package, character.only = TRUE)
+    }
+  }
+}
+
+necessary_packages <- c("knitr", "readr", "tidyverse", "kableExtra","DT")
+
+install_and_load_packages(necessary_packages)
+
+opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+# Load Data
+```{r}
+SerieA2022 <- read_delim("C:/Users/Pc/iCloudDrive/Desktop/Asesorias Estadisticas/UANDES/OBS Control Prenatal/Control-Prenatal/data_manuals/SERIE_REM_2022/SerieA.txt", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+SerieA2023 <- read_delim("C:/Users/Pc/iCloudDrive/Desktop/Asesorias Estadisticas/UANDES/OBS Control Prenatal/Control-Prenatal/data_manuals/SERIE_REM_2023/Datos/SerieA2023.txt", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+Inscritos_APS_2022 <- read_csv("C:/Users/Pc/iCloudDrive/Desktop/Asesorias Estadisticas/UANDES/OBS Control Prenatal/Control-Prenatal/data_manuals/Inscritos APS 2022/Inscritos APS 2022.csv", 
+    locale = locale(encoding = "ISO-8859-1"))
+```
+
+# Data administration
+```{r}
+resultados_sanbernardo <- Inscritos_APS_2022 %>%
+  filter(COD_CENTRO %in% c(113313, 113728, 113328, 113713, 113316, 113716, 113330, 113315, 113332, 113394)) %>%
+  group_by(PERIODO, SERVICIO_SALUD, REGION, COMUNA, COD_CENTRO, NOMBRE_CENTRO, NOMBRE_DEPENDENCIA, EDAD_TRAMO, SEXO) %>%
+  summarise(TOTAL_INSCRITOS = sum(TOTAL_INSCRITOS), .groups = "drop") %>%
+  group_by(COD_CENTRO, NOMBRE_CENTRO) %>%
+  summarise(
+    `Total Beneficiarios 2022`  = sum(TOTAL_INSCRITOS),
+    `Total Mujeres Beneficiarias 2022`  = sum(TOTAL_INSCRITOS[SEXO == "Mujer"]),
+    `Total Mujeres (15-49 años) Beneficiarias 2022` = sum(TOTAL_INSCRITOS[SEXO == "Mujer" & EDAD_TRAMO %in% c("15 a 19 años", "20 a 24 años", "25 a 29 años", "30 a 34 años", "35 a 39 años", "40 a 44 años", "45 a 49 años")]),
+    .groups = "drop"
+  )  %>%
+  mutate(NOMBRE_CENTRO = recode(NOMBRE_CENTRO,
+                                "Centro Comunitario De Salud Familiar Cerrillos De Nos" = "Centro Comunitario De Salud Familiar Ribera del Maipo",
+                                "Centro Comunitario De Salud Familiar Juan Pablo Ii" = "Centro Comunitario De Salud Familiar Juan Pablo II"))
+
+# Define a vector of IdEstablecimiento and their corresponding names
+establecimientos <- data.frame(
+  IdEstablecimiento = c(113313, 113728, 113328, 113713, 113316, 113716, 113330, 113315, 113332, 113394),
+  Establecimiento = c("Dr. Raúl Cuevas", "Lo Herrera", "Padre J. Alsina", "Ribera del maipo", "Carol Urzúa", "Rapa Nui", "Raúl Brañez", "Confraternidad", "Juan Pablo II", "El manzano")
+)
+
+# Define a vector of CodigoPrestacion and their corresponding names
+prestaciones <- data.frame(
+  CodigoPrestacion = c("01080008", "01080010", "01080009", "01090050"),
+  NombrePrestacion = c("Gestantes ingresadas", "Primigestas ingresadas", "Gestantes ingresadas antes de las 14 semanas", "Gestantes con embarazo no planificado")
+)
+
+# Filter and summarize function
+summarize_establecimiento <- function(data, id, name) {
+  data %>%
+    filter(CodigoPrestacion %in% c("01080008", "01080010", "01080009", "01090050")) %>%
+    filter(IdEstablecimiento == id) %>%
+    group_by(CodigoPrestacion) %>%
+    summarize(`Total Prestación` = sum(Col01, na.rm = TRUE)) %>%
+    add_row(CodigoPrestacion = "Total", `Total Prestación` = sum(.$`Total Prestación`)) %>%
+    mutate(COD_CENTRO = id, Establecimiento = name) %>%
+    left_join(prestaciones, by = "CodigoPrestacion") %>%
+    mutate("Prestación: Ingresos de gestantes a programa prenatal."= ifelse(CodigoPrestacion == "Total", "Total", NombrePrestacion)) %>%
+    select(COD_CENTRO, Establecimiento, `Prestación: Ingresos de gestantes a programa prenatal.`, `Total Prestación`)
+}
+
+# Apply the function to all establecimientos and bind the results for 2022
+sanbernardo2022 <- establecimientos %>%
+  rowwise() %>%
+  do(summarize_establecimiento(SerieA2022, .$IdEstablecimiento, .$Establecimiento)) %>%
+  ungroup() %>% 
+  rename("Total Prestación 2022"=`Total Prestación`)
+
+# Apply the function to all establecimientos and bind the results for 2023
+sanbernardo2023 <- establecimientos %>%
+  rowwise() %>%
+  do(summarize_establecimiento(SerieA2023, .$IdEstablecimiento, .$Establecimiento)) %>%
+  ungroup() %>% 
+  rename("Total Prestación 2023"=`Total Prestación`)
+
+sanbernardo <- resultados_sanbernardo %>% 
+  left_join(.,sanbernardo2022[,-2], by = "COD_CENTRO") %>% 
+  left_join(.,sanbernardo2023[,-2], by = c("COD_CENTRO", "Prestación: Ingresos de gestantes a programa prenatal.")) %>% 
+  rename("ID Centro de salud" = COD_CENTRO,
+         "Nombre Centro de salud"=NOMBRE_CENTRO) 
+
+```
+
+# Table (Static)
+```{r}
+sanbernardo %>%
+  kable("html") %>%
+  kable_styling(full_width = F) %>%
+  collapse_rows(valign = "top")
+```
+
+# Table (Interactive)
+```{r}
+datatable(sanbernardo, options = list(pageLength = 5, autoWidth = TRUE))
+```
+
+
+
