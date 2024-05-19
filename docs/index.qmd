@@ -11,6 +11,15 @@ format:
     css: styles.css
     code-fold: true
 ---
+
+# Introduction
+
+This document corresponds to a descriptive study with secondary data on the access to prenatal care in various health establishments in the San Bernardo municipality, in the Metropolitan Region of Chile. The databases are available by clicking on the link:
+
+[Resumen de datos estadísticos mensuales (REM)](https://deis.minsal.cl/#datosabiertos)
+
+[Población inscrita APS 2022](https://www.fonasa.cl/sites/fonasa/datos-abiertos/estadisticas-anuales)
+
 ```{css, echo=FALSE}
 /* Definir la fuente personalizada para la tabla datatable */
 table.dataTable {
@@ -47,6 +56,7 @@ opts_chunk$set(
 ```
 
 # Load Data
+
 ```{r}
 SerieA2022 <- read_delim("C:/Users/Pc/iCloudDrive/Desktop/Asesorias Estadisticas/UANDES/OBS Control Prenatal/Control-Prenatal/data_manuals/SERIE_REM_2022/SerieA.txt", 
     delim = ";", escape_double = FALSE, trim_ws = TRUE)
@@ -57,6 +67,7 @@ Inscritos_APS_2022 <- read_csv("C:/Users/Pc/iCloudDrive/Desktop/Asesorias Estadi
 ```
 
 # Data administration
+
 ```{r}
 resultados_sanbernardo <- Inscritos_APS_2022 %>%
   filter(COD_CENTRO %in% c(113313, 113728, 113328, 113713, 113316, 113716, 113330, 113315, 113332, 113394)) %>%
@@ -122,6 +133,7 @@ sanbernardo <- resultados_sanbernardo %>%
 ```
 
 # Table (Static)
+
 ```{r}
 sanbernardo %>%
   kable("html") %>%
@@ -130,9 +142,7 @@ sanbernardo %>%
 ```
 
 # Table (Interactive)
+
 ```{r}
 datatable(sanbernardo, options = list(pageLength = 5, autoWidth = TRUE))
 ```
-
-
-
