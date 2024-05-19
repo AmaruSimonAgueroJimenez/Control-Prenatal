@@ -6,7 +6,7 @@
 
 # Introduction
 
-This document corresponds to a descriptive study with secondary data on the access to prenatal care in various health establishments in the San Bernardo municipality, in the Metropolitan Region of Chile. The databases are available by clicking on the link:
+This document corresponds to a descriptive study with secondary data on access to prenatal care in various health establishments in San Bernardo municipality in the Metropolitan Region of Chile. The data were made available by clicking on the link:
 
 [Resumen de datos estadísticos mensuales (REM)](https://deis.minsal.cl/#datosabiertos)
 
