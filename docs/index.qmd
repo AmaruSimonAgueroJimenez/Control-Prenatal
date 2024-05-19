@@ -1,8 +1,9 @@
 ---
-title: "Control Prenatal (San Bernardo 2022 2023)"
+title: "Control Prenatal San Bernardo 2022-2023."
+subtitle: "Facultad de enfermería y obstetricia, Universidad de los Andes."
 author: 
-- Amaru Agüero Jiménez
-- Maria Paz Ross
+- Amaru Agüero Jiménez, aaguero@miuandes.cl
+- Maria Paz Ross Arias, mpross@uandes.cl
 format:
   html:
     toc: true
@@ -70,7 +71,7 @@ resultados_sanbernardo <- Inscritos_APS_2022 %>%
   )  %>%
   mutate(NOMBRE_CENTRO = recode(NOMBRE_CENTRO,
                                 "Centro Comunitario De Salud Familiar Cerrillos De Nos" = "Centro Comunitario De Salud Familiar Ribera del Maipo",
-                                "Centro Comunitario De Salud Familiar Juan Pablo Ii" = "Centro Comunitario De Salud Familiar Juan Pablo II"))
+                                "Centro Comunitario De Salud Familiar Juan Pablo II" = "Centro Comunitario De Salud Familiar Juan Pablo Ii"))
 
 # Define a vector of IdEstablecimiento and their corresponding names
 establecimientos <- data.frame(
