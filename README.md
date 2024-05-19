@@ -1,16 +1,8 @@
----
-title: "Control Prenatal San Bernardo 2022-2023."
-subtitle: "Facultad de enfermería y obstetricia, Universidad de los Andes."
-author: 
+
+# Control Prenatal San Bernardo 2022-2023.
+## Facultad de enfermería y obstetricia, Universidad de los Andes. 
 - Amaru Agüero Jiménez, aaguero@miuandes.cl
 - Maria Paz Ross Arias, mpross@uandes.cl
-format:
-  html:
-    toc: true
-    number-sections: true
-    css: styles.css
-    code-fold: true
----
 
 # Introduction
 
