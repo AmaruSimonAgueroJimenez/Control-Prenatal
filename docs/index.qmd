@@ -82,7 +82,7 @@ resultados_sanbernardo <- Inscritos_APS_2022 %>%
   )  %>%
   mutate(NOMBRE_CENTRO = recode(NOMBRE_CENTRO,
                                 "Centro Comunitario De Salud Familiar Cerrillos De Nos" = "Centro Comunitario De Salud Familiar Ribera del Maipo",
-                                "Centro Comunitario De Salud Familiar Juan Pablo II" = "Centro Comunitario De Salud Familiar Juan Pablo Ii"))
+                                "Centro De Salud Familiar Juan Pablo Ii" = "Centro De Salud Familiar Juan Pablo II"))
 
 # Define a vector of IdEstablecimiento and their corresponding names
 establecimientos <- data.frame(
